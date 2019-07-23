@@ -1,0 +1,318 @@
+$.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+});
+//update category
+
+$(document).ready(function(){
+	// update category
+   $('.edit').click(function(){
+
+   	  $('.error').hide();
+     let id= $(this).data('id');
+     //alert(id); ok da lay dc id
+     $.ajax({
+     	url : 'admin/category/'+id+'/edit',
+     	dataType : 'json',
+     	type : 'get',
+     	success :function($result){
+     		 console.log($result);// ok da lay dc object
+     		 $('.name').val($result.name);
+     		 $('.title').text($result.name);
+     		 if($result.status == 1){
+     		 	$('.ht').attr('selected','selected');
+
+     		 }
+     		 else{
+     		 	$('.kht').attr('selected','selected');
+     		 }
+
+     	}
+
+
+     });
+     $('.update').click(function(){
+     	let ten =$('.name').val();
+     	let status =$('.status').val();
+     	$.ajax({
+     		url :'admin/category/'+id,
+     		data:{
+     			name: ten,
+     			status:status,
+     		},
+     		type :'put',
+     		dataType:'json',
+     		success:function($result){
+     			console.log($result);
+     			if($result.error){
+     				$('.error').show();
+     				$('.error').html($result.message.name[0]);
+     			}else{
+     				toastr.success($result.success, 'Thông báo', {timeOut: 15000});
+     				$('#edit').modal('hide');
+     				location.reload();
+     			}
+     		}
+
+     	});
+
+     });
+
+   });
+
+   // delete category
+   $('.delete').click(function(){
+		let id = $(this).data('id');
+		$('.del').click(function(){
+			$.ajax({
+				url : 'admin/category/'+id,
+				dataType : 'json',
+				type : 'delete',
+				success : function($result){
+					toastr.success($result.success, 'Thông báo', {timeOut: 15000});
+					$('#delete').modal('hide');
+					location.reload();
+				}
+			});
+		});
+	});
+
+   // edit producttype
+ 	$('.editProducttype').click(function(){
+		$('.error').hide();
+		let id = $(this).data('id');
+		$.ajax({
+			url : 'admin/producttype/'+id+'/edit',
+			dataType : 'json',
+			type : 'get',
+			success : function($result){
+				$('.name').val($result.producttype.name);
+				var html = '';
+				$.each($result.category,function($key,$value){
+					if($value['id'] == $result.producttype.idCategory){
+						html += '<option value='+$value['id']+' selected>';
+							html += $value['name'];
+						html += '</option>';	
+					}else{
+						html += '<option value='+$value['id']+'>';
+							html += $value['name'];
+						html += '</option>';
+					}	
+				});
+				$('.idCategory').html(html);
+				if($result.producttype.status == 1){
+					$('.ht').attr('selected','selected');
+				}else{
+					$('.kht').attr('selected','selected');
+				}
+			}
+		});
+		$('.updateProductType').click(function(){
+			let idCategory = $('.idCategory').val();
+			let name = $('.name').val();
+			let status = $('status').val();
+			$.ajax({
+				url : 'admin/producttype/'+id,
+				dataType : 'json',
+				data : {
+					idCategory : idCategory,
+					name : name,
+					status : status,
+				},
+				type : 'put',
+				success : function($data){
+					if($data.error == 'true'){
+						$('.error').show();
+						$('.error').text($data.message.name[0]);	
+					}else{
+						toastr.success($data.result, 'Thông báo', {timeOut: 5000});
+						$('#edit').modal('hide');
+						location.reload();
+					}
+				}
+			})
+		});
+	});
+	// delete producttype
+
+	$('.deleteProducttype').click(function(){
+		let id =$(this).data('id');
+		$('.delProductType').click(function(){
+			$.ajax({
+				url:'admin/producttype/'+id,
+				dataType:'json',
+				type:'delete',
+				success : function($data){
+					toastr.success($data.result, 'Thông báo', {timeOut: 5000});
+					$('#delete').modal('hide');
+					location.reload();
+				}
+
+			});
+
+		});
+
+	});
+// hiển thị loại sản phẩm theo danh mục
+
+  $('.cateProduct').change(function(){
+		let idCate = $(this).val();
+		$.ajax({
+			url : 'getproducttype',
+			data : {
+				idCate : idCate
+			},
+			type : 'get',
+			dataType : 'json',
+			success : function(data){
+				let html = '';
+				$.each(data,function($key,$value){
+					html += '<option value='+$value['id']+'>';
+						html += $value['name'];
+					html += '</option>';	
+				});
+				$('.proTypeProduct').html(html);
+			}
+		});
+	})
+
+  // delete product
+  $('.deleteProduct').click(function(){
+  	let id = $(this).data('id');
+  	$('.delProduct').click(function(){
+  		$.ajax({
+  			url:'admin/product/'+id,
+  			type:'delete',
+  			dataType:'json',
+  			success:function(data){
+  				toastr.success(data.result, 'Thông báo', {timeOut: 5000});
+					$('#delete').modal('hide');
+					location.reload();
+  			}
+
+
+  		});
+
+  	});
+
+  });
+
+  // Edit product
+   $('.editProduct').click(function(){
+		$('.errorName').hide();
+		$('.errorQuantity').hide();
+		$('.errorPrice').hide();
+		$('.errorPromotinal').hide();
+		$('.errorImage').hide();
+		$('.errorDescription').hide();
+		let id = $(this).data('id');
+		$.ajax({
+			url : 'admin/product/'+id+'/edit',
+			dataType : 'json',
+			type : 'get',
+			success : function(data){
+				$('.name').val(data.product.name);
+				$('.quantity').val(data.product.quantity);
+				$('.price').val(data.product.price);
+				$('.promotinal').val(data.product.promotinal);
+				$('.imageThum').attr('src','img/upload/product/'+data.product.image);
+				if(data.product.status == 1){
+					$('.ht').attr('selected','selected');
+				}else{
+					$('.kht').attr('selected','selected');
+				}
+				CKEDITOR.instances['demo'].setData(data.product.description);
+				let html1 = '';
+				$.each(data.category,function(key,value){
+					if(data.product.idCategory == value['id']){
+						html1 += '<option value="'+value['id']+'" selected>';
+							html1 += value['name'];
+						html1 += '</option>';
+					}else{
+						html1 += '<option value="'+value['id']+'">';
+							html1 += value['name'];
+						html1 += '</option>';
+					}
+				});
+				$('.cateProduct').html(html1);
+				let html2 = '';
+				$.each(data.producttype,function(key,value){
+					if(data.product.idProductType == value['id']){
+						html2 += '<option value="'+value['id']+'" selected>';
+							html2 += value['name'];
+						html2 += '</option>';		
+					}else{
+						html2 += '<option value="'+value['id']+'">';
+							html2 += value['name'];
+						html2 += '</option>';	
+					}
+				});
+				$('.proTypeProduct').html(html2);
+			}
+		});
+		$('#updateProduct').on('submit',function(even){
+			// chan form sumit
+			event.preventDefault();
+			$.ajax({
+				url:'admin/updatePro/'+id,
+				data : new FormData(this),
+				contentType : false,
+				processData : false,
+				cache : false,
+				type : 'post',
+				success:function(data){
+					 console.log(data);
+					if(data.error){
+						if(data.message.image){
+							$('.errorImage').show();
+							$('.errorImage').text(data.message.image[0]);
+							$('.image').val('');
+						}
+						if(data.message.name){
+							$('.errorName').show();
+							$('.errorName').text(data.message.name[0]);
+							$('.name').val('');
+						}
+						if(data.message.quantity){
+							$('.errorQuantity').show();
+							$('.errorQuantity').text(data.message.quantity[0]);
+							$('.quantity').val('');
+						}
+						if(data.message.price){
+							$('.errorPrice').show();
+							$('.errorPrice').text(data.message.price[0]);
+							$('.price').val('');
+						}
+						if(data.message.promotinal){
+							$('.errorPromotinal').show();
+							$('.errorPromotinal').text(data.message.promotinal[0]);
+							$('.promotinal').val('');
+						}
+						if(data.message.description){
+							$('.errorDescription').show();
+							$('.errorDescription').text(data.message.description[0]);
+							$('.description').val('');
+						}
+
+					}else{
+						toastr.success(data.result, 'Thông báo', {timeOut: 5000});
+						$('#edit').modal('hide');
+						location.reload();
+					}
+
+				}
+
+			});
+
+		});
+
+	});	
+
+
+
+
+  
+   
+});
+
