@@ -12,10 +12,13 @@ class OderDetail extends Model
     	'idOrder','idProduct','quantity','price',
 
 
-    ]
+    ];
     //xem chi tiet order cua order nao
     public function Order()
     {
-    	return $this->belongsTo('App\Models\Order','idOder','id');
+    	return $this->belongsTo('App\Models\Orders','idOder','id');
+    }
+    public function Product(){
+        return $this->belongsTo('App\Models\Products','idProduct','id');
     }
 }

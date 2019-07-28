@@ -32,10 +32,19 @@ Route::get('logout','HomeController@logout');
 Route::post('signup','HomeController@signup')->name('signup');
 
 
+
+
+
+
+
+
 Route::post('login','HomeController@login')->name('login');
 
 Route::resource('cart','CartController');
 
 Route::get('addcart/{id}','CartController@addCart')->name('addCart');
 
+Route::get('checkout','CartController@checkout')->name('checkout');
+
+Route::resource('customer','CustomerController');
 

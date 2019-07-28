@@ -28,4 +28,8 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
     protected $table ='users';// lien ket model voi bang user
+
+    public function customer(){
+        return $this->hasMany('App\Models\Customer','idUser','id');
+    }
 }

@@ -46,6 +46,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 	<link href="assets/client/css/font2.css"
 	    rel="stylesheet">
 	<!-- //web fonts -->
+	<link rel="stylesheet" type="text/css" href="assets/client/css/easy-responsive-tabs.css">
 
 </head>
 
